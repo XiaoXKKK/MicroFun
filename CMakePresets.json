@@ -5,9 +5,21 @@
             "name": "debug",
             "displayName": "Debug Configuration",
             "description": "Debug build using Clang",
-            "binaryDir": "${sourceDir}/build",
+            "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release Configuration",
+            "description": "Release build matching run.sh (split_tool & check_tool)",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_C_COMPILER": "/usr/bin/clang",
                 "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
@@ -16,8 +28,28 @@
     ],
     "buildPresets": [
         {
-            "name": "debug",
-            "configurePreset": "debug"
+            "name": "debug-all",
+            "displayName": "Debug All Targets",
+            "configurePreset": "debug",
+            "targets": ["split_tool", "check_tool"]
+        },
+        {
+            "name": "release-all",
+            "displayName": "Release All Targets",
+            "configurePreset": "release",
+            "targets": ["split_tool", "check_tool"]
+        },
+        {
+            "name": "split",
+            "displayName": "Release split_tool",
+            "configurePreset": "release",
+            "targets": ["split_tool"]
+        },
+        {
+            "name": "check",
+            "displayName": "Release check_tool",
+            "configurePreset": "release",
+            "targets": ["check_tool"]
         }
     ]
 }

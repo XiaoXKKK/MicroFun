@@ -8,14 +8,14 @@ set -euo pipefail
 # Build artifacts are placed under build/ and resulting tools copied to bin/
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILD_DIR="$ROOT_DIR/build"
+BUILD_DIR="$ROOT_DIR/build/release"
 BIN_DIR="$ROOT_DIR/bin"
 
 ensure_build() {
   if [[ ! -x "$BIN_DIR/split_tool" || ! -x "$BIN_DIR/check_tool" ]]; then
     echo "[Build] Compiling tools..."
     mkdir -p "$BUILD_DIR" "$BIN_DIR"
-    (cd "$BUILD_DIR" && cmake .. -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build . --config Release >/dev/null)
+    (cd "$BUILD_DIR" && cmake ../.. -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build . --config Release >/dev/null)
     cp "$BUILD_DIR/split_tool" "$BIN_DIR/" || true
     cp "$BUILD_DIR/check_tool" "$BIN_DIR/" || true
   fi
