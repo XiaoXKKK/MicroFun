@@ -4,11 +4,14 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
 bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
                                  const string &outFile) const {
+  using clock = std::chrono::high_resolution_clock;
+  auto t0 = clock::now();
   auto tiles = index.query(vp);
   if (tiles.empty()) {
     cerr << "No tiles overlap viewport\n";
@@ -58,5 +61,8 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
     cerr << "Failed write viewport png\n";
     return false;
   }
+  auto t1 = clock::now();
+  double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+  cerr << "Assemble time: " << ms << " ms (viewport " << vp.w << "x" << vp.h << ", tiles=" << tiles.size() << ")\n";
   return true;
 }
