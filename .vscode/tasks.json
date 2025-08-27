@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmake configure (debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S", "${workspaceFolder}",
+                "-B", "${workspaceFolder}/build/debug",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build split_tool (debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}/build/debug",
+                "--target", "split_tool",
+                "--", "-j"
+            ],
+            "problemMatcher": ["$gcc"],
+            "dependsOn": ["cmake configure (debug)"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build check_tool (debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}/build/debug",
+                "--target", "check_tool",
+                "--", "-j"
+            ],
+            "problemMatcher": ["$gcc"],
+            "dependsOn": ["cmake configure (debug)"]
+        },
+        {
+            "label": "build all tools (debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}/build/debug",
+                "--target", "split_tool", "check_tool",
+                "--", "-j"
+            ],
+            "problemMatcher": ["$gcc"],
+            "dependsOn": ["cmake configure (debug)"]
+        }
+    ]
+}
