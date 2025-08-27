@@ -15,6 +15,8 @@ bool TileIndex::load(const string& metaFile){
         stringstream ss(line);
         TileMeta m; ss>>m.x>>m.y>>m.w>>m.h>>m.file; if(ss) tiles_.push_back(m);
     }
+    mapWidth_ = 0; mapHeight_ = 0;
+    for(auto &m: tiles_){ mapWidth_ = max(mapWidth_, m.x + m.w); mapHeight_ = max(mapHeight_, m.y + m.h);}    
     return true;
 }
 
@@ -28,7 +30,11 @@ bool TileIndex::save(const string& metaFile) const {
     return true;
 }
 
-void TileIndex::setTiles(vector<TileMeta> tiles){ tiles_ = std::move(tiles); }
+void TileIndex::setTiles(vector<TileMeta> tiles){
+    tiles_ = std::move(tiles);
+    mapWidth_ = 0; mapHeight_ = 0;
+    for(auto &m: tiles_){ mapWidth_ = max(mapWidth_, m.x + m.w); mapHeight_ = max(mapHeight_, m.y + m.h);}    
+}
 
 vector<TileMeta> TileIndex::query(const Viewport& vp) const {
     vector<TileMeta> out;

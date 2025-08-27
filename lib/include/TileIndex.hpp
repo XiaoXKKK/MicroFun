@@ -18,6 +18,10 @@ public:
     std::vector<TileMeta> query(const Viewport& vp) const;
     bool save(const std::string& metaFile) const; // for split phase
     void setTiles(std::vector<TileMeta> tiles);
+    int getMapWidth() const { return mapWidth_; }
+    int getMapHeight() const { return mapHeight_; }
 private:
     std::vector<TileMeta> tiles_;
+    int mapWidth_ = 0;  // derived from tiles: max(x+w)
+    int mapHeight_ = 0; // derived from tiles: max(y+h) (y 自顶向下递增)
 };

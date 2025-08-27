@@ -146,11 +146,23 @@ class PerformanceMonitor {
 
 ## 命令行接口扩展
 
-### 当前命令
-- `./run.sh split -i input.png --tile WxH --meta meta.txt`
-- `./run.sh check -i meta.txt -p X,Y -s WxH -o output.png`
+### 当前命令 (已更新)
+- 预处理拆分: `./run.sh split -i <input.png> -o <output_dir>`  
+   - 生成 `<output_dir>` 下所有瓦片 PNG 与 `meta.txt` 索引文件。
+   - 内部仍支持隐藏参数 `--tile WxH` 与 `--meta meta.txt` 以便调试；正式文档不再暴露。
+- 视口组合预览: `./run.sh run -i <resource_dir> -p <posx>,<posy> -s <w>,<h>`  
+   - 默认标准输出按行主序输出 `w*h` 个像素的 `0xRRGGBBAA`（逗号分隔）。
+   - 可选 `-o viewport.png` 输出 PNG（兼容旧流程）。
+- 向后兼容: `run` == `check`，保留旧命令名。
 
-### 建议新增命令
+示例:
+```bash
+./run.sh split -i data/sample1.png -o data/tiles
+./run.sh run -i data/tiles -p 0,0 -s 128,128            # 输出十六进制像素流
+./run.sh run -i data/tiles -p 0,0 -s 512,512 -o vp.png  # 输出 PNG
+```
+
+### 建议新增命令（保持不变，待实现）
 ```bash
 # 性能分析
 ./run.sh benchmark -i input.png --iterations 10 --report bench.json
