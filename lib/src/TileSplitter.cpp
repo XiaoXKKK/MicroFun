@@ -3,6 +3,7 @@
 #include "stb_image_write.h"
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 using namespace std;
 
