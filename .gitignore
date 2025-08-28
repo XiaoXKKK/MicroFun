@@ -3,8 +3,8 @@
 !.vscode/tasks.json
 .cache/
 bin/
-**/build/
+build/
 data/
 *.pdf
 .DS_Store
-*.txt
+compile_commands.json

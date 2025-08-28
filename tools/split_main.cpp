@@ -6,6 +6,41 @@
 #include "TileIndex.hpp"
 #include "TileSplitter.hpp"
 
+// 清空目标文件夹的函数
+bool clearOutputDirectory(const std::string& dirPath) {
+    try {
+        if (std::filesystem::exists(dirPath)) {
+            if (!std::filesystem::is_directory(dirPath)) {
+                std::cerr << "Warning: " << dirPath << " exists but is not a directory\n";
+                return false;
+            }
+            
+            // 检查文件夹是否为空
+            if (!std::filesystem::is_empty(dirPath)) {
+                std::cout << "Target directory " << dirPath << " is not empty, clearing...\n";
+                
+                // 删除文件夹中的所有内容
+                for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
+                    std::filesystem::remove_all(entry.path());
+                }
+                
+                std::cout << "Directory cleared successfully.\n";
+            }
+        } else {
+            // 如果目录不存在，创建它
+            std::filesystem::create_directories(dirPath);
+            std::cout << "Created output directory: " << dirPath << "\n";
+        }
+        return true;
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << "\n";
+        return false;
+    } catch (const std::exception& e) {
+        std::cerr << "Error clearing directory: " << e.what() << "\n";
+        return false;
+    }
+}
+
 int main(int argc, char** argv) {
     std::string input;
     std::string outDir = "data/tiles";  // default output dir
@@ -84,6 +119,13 @@ int main(int argc, char** argv) {
             // 固定尺寸分割
             std::string fixedOutDir = outDir + "_fixed";
             std::string fixedMeta = fixedOutDir + "/meta.txt";
+            
+            // 清空固定尺寸输出目录
+            if (!clearOutputDirectory(fixedOutDir)) {
+                std::cerr << "Failed to clear fixed output directory\n";
+                return 2;
+            }
+            
             TileSplitter fixedSplitter;
             auto fixedTiles =
                 fixedSplitter.split(input, fixedOutDir, tileW, tileH);
@@ -99,6 +141,13 @@ int main(int argc, char** argv) {
             // 四叉树分割
             std::string quadOutDir = outDir + "_quadtree";
             std::string quadMeta = quadOutDir + "/meta.txt";
+            
+            // 清空四叉树输出目录
+            if (!clearOutputDirectory(quadOutDir)) {
+                std::cerr << "Failed to clear quad-tree output directory\n";
+                return 2;
+            }
+            
             QuadTreeSplitter quadSplitter;
             auto quadTiles =
                 quadSplitter.splitQuadTree(input, quadOutDir, quadTreeConfig);
@@ -128,12 +177,25 @@ int main(int argc, char** argv) {
             std::cout << "  Color tolerance: " << quadTreeConfig.colorTolerance
                       << "\n";
 
+            // 清空输出目录
+            if (!clearOutputDirectory(outDir)) {
+                std::cerr << "Failed to clear output directory\n";
+                return 2;
+            }
+
             QuadTreeSplitter splitter;
             tiles = splitter.splitQuadTree(input, outDir, quadTreeConfig);
         } else {
             // 传统固定尺寸分割模式
             std::cout << "Using fixed-size splitting: " << tileW << "x" << tileH
                       << "\n";
+            
+            // 清空输出目录
+            if (!clearOutputDirectory(outDir)) {
+                std::cerr << "Failed to clear output directory\n";
+                return 2;
+            }
+            
             TileSplitter splitter;
             tiles = splitter.split(input, outDir, tileW, tileH);
         }
