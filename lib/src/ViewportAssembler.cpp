@@ -9,7 +9,7 @@
 using namespace std;
 
 bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
-                                 const string &outFile) const {
+                                 const string &resourceDir, const string &outFile) const {
   using clock = std::chrono::high_resolution_clock;
   auto t0 = clock::now();
   auto tiles = index.query(vp);
@@ -45,7 +45,7 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
   // relative path externally)
   for (auto &t : tiles) {
     int w, h, c;
-    unsigned char *data = stbi_load((string("data/tiles/") + t.file).c_str(), &w, &h, &c, 4);
+    unsigned char *data = stbi_load((resourceDir + "/" + t.file).c_str(), &w, &h, &c, 4);
     if (!data) {
       cerr << "Failed load tile " << t.file << "\n";
       continue;
@@ -55,6 +55,7 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
     blit(data, w, h, w * 4, localX, localY);
     stbi_image_free(data);
   }
+
   // write viewport png
   if (!stbi_write_png(outFile.c_str(), vp.w, vp.h, 4, canvas.data(),
                       vp.w * 4)) {

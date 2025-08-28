@@ -7,6 +7,10 @@ add_subdirectory(lib)
 
 add_executable(split_tool tools/split_main.cpp)
 add_executable(check_tool tools/check_main.cpp)
+add_executable(quadtree_split_test tools/quadtree_split_test.cpp)
+add_executable(quadtree_index_test tools/quadtree_index_test.cpp)
 
 target_link_libraries(split_tool PRIVATE mapcore)
 target_link_libraries(check_tool PRIVATE mapcore)
+target_link_libraries(quadtree_split_test PRIVATE mapcore)
+target_link_libraries(quadtree_index_test PRIVATE mapcore)

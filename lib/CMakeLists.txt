@@ -3,6 +3,10 @@ add_library(mapcore STATIC
 	src/TileIndex.cpp
 	src/ViewportAssembler.cpp
 	src/stb_image_all.cpp
+	src/QuadTreeNode.cpp
+	src/ColorChecker.cpp
+	src/QuadTreeSplitter.cpp
+	src/QuadTreeIndex.cpp
 )
 
 target_include_directories(mapcore PUBLIC include)
