@@ -47,7 +47,13 @@ void QuadTreeIndex::insertTile(IndexQuadTreeNode* node, int tileIndex,
 
     // 如果是叶子节点
     if (node->node->isLeaf()) {
-        node->tileIndices.push_back(tileIndex);
+        // 检查瓦片是否完全包含在当前节点内
+        if (node->contains(tile.x, tile.y, tile.w, tile.h)) {
+            node->tileIndices.push_back(tileIndex);
+        } else {
+            // 瓦片跨越边界，放在当前节点
+            node->tileIndices.push_back(tileIndex);
+        }
 
         // 检查是否需要分割节点
         if (node->tileIndices.size() >
@@ -57,20 +63,43 @@ void QuadTreeIndex::insertTile(IndexQuadTreeNode* node, int tileIndex,
             // 分割节点
             node->subdivide();
 
-            // 将当前节点的瓦片重新分配到子节点
-            std::vector<int> tilesToRedistribute = std::move(node->tileIndices);
-            node->tileIndices.clear();
-
-            for (int oldTileIndex : tilesToRedistribute) {
+            // 重新分配瓦片：只有完全包含在子节点内的瓦片才移动到子节点
+            std::vector<int> remainingTiles;
+            
+            for (int oldTileIndex : node->tileIndices) {
+                const TileMeta& oldTile = tiles_[oldTileIndex];
+                bool movedToChild = false;
+                
                 for (auto& child : node->children) {
-                    insertTile(child.get(), oldTileIndex, depth + 1);
+                    if (child->contains(oldTile.x, oldTile.y, oldTile.w, oldTile.h)) {
+                        insertTile(child.get(), oldTileIndex, depth + 1);
+                        movedToChild = true;
+                        break;  // 瓦片只能完全属于一个子节点
+                    }
+                }
+                
+                // 如果瓦片跨越多个子节点，保留在当前节点
+                if (!movedToChild) {
+                    remainingTiles.push_back(oldTileIndex);
                 }
             }
+            
+            node->tileIndices = std::move(remainingTiles);
         }
     } else {
-        // 如果不是叶子节点，递归插入到子节点
+        // 非叶子节点：只对完全包含的瓦片递归插入
+        bool inserted = false;
         for (auto& child : node->children) {
-            insertTile(child.get(), tileIndex, depth + 1);
+            if (child->contains(tile.x, tile.y, tile.w, tile.h)) {
+                insertTile(child.get(), tileIndex, depth + 1);
+                inserted = true;
+                break;  // 瓦片只能完全属于一个子节点
+            }
+        }
+        
+        // 如果瓦片不能完全包含在任何子节点中，存储在当前节点
+        if (!inserted) {
+            node->tileIndices.push_back(tileIndex);
         }
     }
 }
@@ -81,41 +110,34 @@ std::vector<TileMeta> QuadTreeIndex::query(const Viewport& vp) const {
         return result;
     }
 
-    std::unordered_set<int> visited;
-    queryRecursive(root_.get(), vp, result, visited);
+    queryRecursive(root_.get(), vp, result);
     return result;
 }
 
 void QuadTreeIndex::queryRecursive(const IndexQuadTreeNode* node,
                                    const Viewport& vp,
-                                   std::vector<TileMeta>& result,
-                                   std::unordered_set<int>& visited) const {
+                                   std::vector<TileMeta>& result) const {
     // 检查节点是否与视口相交
     if (!node->intersects(vp.x, vp.y, vp.w, vp.h)) {
         return;
     }
 
-    if (node->node->isLeaf()) {
-        // 叶子节点：检查所有瓦片
-        for (int tileIndex : node->tileIndices) {
-            if (visited.find(tileIndex) != visited.end()) {
-                continue;  // 已经访问过
-            }
-
-            const TileMeta& tile = tiles_[tileIndex];
-            // 检查瓦片是否与视口相交
-            bool overlap =
-                !(tile.x + tile.w <= vp.x || tile.y + tile.h <= vp.y ||
-                  tile.x >= vp.x + vp.w || tile.y >= vp.y + vp.h);
-            if (overlap) {
-                result.push_back(tile);
-                visited.insert(tileIndex);
-            }
+    // 检查当前节点存储的瓦片
+    for (int tileIndex : node->tileIndices) {
+        const TileMeta& tile = tiles_[tileIndex];
+        // 检查瓦片是否与视口相交
+        bool overlap =
+            !(tile.x + tile.w <= vp.x || tile.y + tile.h <= vp.y ||
+              tile.x >= vp.x + vp.w || tile.y >= vp.y + vp.h);
+        if (overlap) {
+            result.push_back(tile);
         }
-    } else {
-        // 非叶子节点：递归查询子节点
+    }
+
+    // 递归查询子节点
+    if (!node->node->isLeaf()) {
         for (const auto& child : node->children) {
-            queryRecursive(child.get(), vp, result, visited);
+            queryRecursive(child.get(), vp, result);
         }
     }
 }

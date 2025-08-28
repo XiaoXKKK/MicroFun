@@ -29,13 +29,14 @@ public:
         //     std::cout << "Max Depth: " << stats.maxDepth << std::endl;
         //     std::cout << "Total Tiles (in leaves): " << stats.totalTiles << std::endl;
         //     std::cout << "Avg Tiles Per Leaf: " << stats.avgTilesPerLeaf << std::endl;
+        //     std::cout << "Actual tiles count: " << tileIndex.query({0, 0, 10000, 10000}).size() << std::endl;
         //     std::cout << "---------------------------\n" << std::endl;
         // }
     }
 
 protected:
     const std::string const_resourceDir = "data/tiles";
-    const std::string quad_resourceDir = "data/test_quadtree";
+    const std::string quad_resourceDir = "data/quad_tiles";
     TileIndex tileIndex;
     QuadTreeIndex quadTreeIndex;
 };

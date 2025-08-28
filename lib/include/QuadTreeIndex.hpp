@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <unordered_set>
 
 #include "QuadTreeNode.hpp"
 #include "TileIndex.hpp"
@@ -27,6 +26,18 @@ struct IndexQuadTreeNode {
         int nh = node->getHeight();
         return !(rx >= nx + nw || ry >= ny + nh || rx + rw <= nx ||
                  ry + rh <= ny);
+    }
+
+    /**
+     * @brief 检查矩形是否完全包含在节点内
+     */
+    bool contains(int rx, int ry, int rw, int rh) const {
+        int nx = node->getX();
+        int ny = node->getY();
+        int nw = node->getWidth();
+        int nh = node->getHeight();
+        return rx >= nx && ry >= ny && 
+               rx + rw <= nx + nw && ry + rh <= ny + nh;
     }
 
     /**
@@ -116,11 +127,9 @@ class QuadTreeIndex : public TileIndex {
      * @param node 当前节点
      * @param vp 视口
      * @param result 结果集
-     * @param visited 已访问的瓦片索引集合（避免重复）
      */
     void queryRecursive(const IndexQuadTreeNode* node, const Viewport& vp,
-                        std::vector<TileMeta>& result,
-                        std::unordered_set<int>& visited) const;
+                        std::vector<TileMeta>& result) const;
 
     /**
      * @brief 计算统计信息（递归）
