@@ -5,8 +5,8 @@
 #include "TileIndex.hpp"
 
 class ViewportAssembler {
- public:
-  bool assemble(const TileIndex& index, const Viewport& vp,
-                const std::string& resourceDir,
-                const std::string& outFile) const;
+   public:
+    bool assemble(const TileIndex& index, const Viewport& vp,
+                  const std::string& resourceDir,
+                  const std::string& outFile) const;
 };
