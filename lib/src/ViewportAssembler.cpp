@@ -1,15 +1,18 @@
 #include "ViewportAssembler.hpp"
-#include "stb_image.h"
-#include "stb_image_write.h"
+
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <chrono>
+
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 using namespace std;
 
-bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
-                                 const string &resourceDir, const string &outFile) const {
+bool ViewportAssembler::assemble(const TileIndex& index, const Viewport& vp,
+                                 const string& resourceDir,
+                                 const string& outFile) const {
   using clock = std::chrono::high_resolution_clock;
   auto t0 = clock::now();
   auto tiles = index.query(vp);
@@ -19,18 +22,16 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
   }
   // RGBA buffer for viewport
   vector<unsigned char> canvas(vp.w * vp.h * 4, 0);
-  auto blit = [&](const unsigned char *src, int sw, int sh, int stride,
+  auto blit = [&](const unsigned char* src, int sw, int sh, int stride,
                   int dstX, int dstY) {
     for (int y = 0; y < sh; ++y) {
-      if (dstY + y < 0 || dstY + y >= vp.h)
-        continue;
-      unsigned char *dstRow = &canvas[(dstY + y) * vp.w * 4];
-      const unsigned char *srcRow = src + y * stride;
+      if (dstY + y < 0 || dstY + y >= vp.h) continue;
+      unsigned char* dstRow = &canvas[(dstY + y) * vp.w * 4];
+      const unsigned char* srcRow = src + y * stride;
       for (int x = 0; x < sw; ++x) {
-        if (dstX + x < 0 || dstX + x >= vp.w)
-          continue;
-        const unsigned char *sp = &srcRow[x * 4];
-        unsigned char *dp = &dstRow[(dstX + x) * 4];
+        if (dstX + x < 0 || dstX + x >= vp.w) continue;
+        const unsigned char* sp = &srcRow[x * 4];
+        unsigned char* dp = &dstRow[(dstX + x) * 4];
         // alpha blend simple over
         float a = sp[3] / 255.0f;
         for (int c = 0; c < 3; ++c) {
@@ -43,9 +44,10 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
   };
   // load each tile (assume current working dir contains tile files or provide
   // relative path externally)
-  for (auto &t : tiles) {
+  for (auto& t : tiles) {
     int w, h, c;
-    unsigned char *data = stbi_load((resourceDir + "/" + t.file).c_str(), &w, &h, &c, 4);
+    unsigned char* data =
+        stbi_load((resourceDir + "/" + t.file).c_str(), &w, &h, &c, 4);
     if (!data) {
       cerr << "Failed load tile " << t.file << "\n";
       continue;
@@ -64,6 +66,7 @@ bool ViewportAssembler::assemble(const TileIndex &index, const Viewport &vp,
   }
   auto t1 = clock::now();
   double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
-  cerr << "Assemble time: " << ms << " ms (viewport " << vp.w << "x" << vp.h << ", tiles=" << tiles.size() << ")\n";
+  cerr << "Assemble time: " << ms << " ms (viewport " << vp.w << "x" << vp.h
+       << ", tiles=" << tiles.size() << ")\n";
   return true;
 }
