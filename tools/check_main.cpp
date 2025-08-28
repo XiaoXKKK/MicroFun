@@ -78,61 +78,13 @@ int main(int argc, char** argv) {
         std::cout << "Assemble OK -> " << png << "\n";
         return 0;
     }
-    // hex dump pathway: assemble to memory (modify assembler? we reuse logic by
-    // writing tmp file then reading; here implement lightweight duplication)
-    auto tiles = index->query(vp);
-    if (tiles.empty()) {
-        std::cerr << "No tiles overlap viewport\n";
-        return 0;
+
+    // hex dump pathway
+    std::string hexResult = assembler.assembleToHex(*index, vp, resourceDir);
+    if (hexResult.empty()) {
+        return 1; // error message already printed by assembler
     }
-    std::vector<unsigned char> canvas(vp.w * vp.h * 4, 0);
-    auto blit = [&](const unsigned char* src, int sw_, int sh_, int stride,
-                    int dx, int dy) {
-        for (int y = 0; y < sh_; ++y) {
-            if (dy + y < 0 || dy + y >= vp.h) continue;
-            unsigned char* dstRow = &canvas[(dy + y) * vp.w * 4];
-            const unsigned char* srcRow = src + y * stride;
-            for (int x = 0; x < sw_; ++x) {
-                if (dx + x < 0 || dx + x >= vp.w) continue;
-                const unsigned char* sp = &srcRow[x * 4];
-                unsigned char* dp = &dstRow[(dx + x) * 4];
-                float a = sp[3] / 255.f;
-                for (int c = 0; c < 3; ++c)
-                    dp[c] =
-                        static_cast<unsigned char>(sp[c] * a + dp[c] * (1 - a));
-                dp[3] = static_cast<unsigned char>(
-                    std::min(255.f, sp[3] + dp[3] * (1 - a)));
-            }
-        }
-    };
-    for (auto& t : tiles) {
-        int w, h, c;
-        std::string tilePath = resourceDir + "/" + t.file;
-        unsigned char* data = stbi_load(tilePath.c_str(), &w, &h, &c, 4);
-        if (!data) {
-            std::cerr << "Fail tile " << t.file << "\n";
-            continue;
-        }
-        int lx = t.x - vp.x;
-        int ly = t.y - vp.y;
-        blit(data, w, h, w * 4, lx, ly);
-        stbi_image_free(data);
-    }
-    // output hex values
-    std::ios oldState(nullptr);
-    oldState.copyfmt(std::cout);
-    std::cout << std::hex << std::uppercase << std::setfill('0');
-    size_t count = vp.w * vp.h;
-    for (size_t i = 0; i < count; ++i) {
-        unsigned char r = canvas[i * 4 + 0];
-        unsigned char g = canvas[i * 4 + 1];
-        unsigned char b = canvas[i * 4 + 2];
-        unsigned char a = canvas[i * 4 + 3];
-        uint32_t v = (r << 24) | (g << 16) | (b << 8) | a;  // 0xRRGGBBAA
-        std::cout << "0x" << std::setw(8) << v;
-        if (i + 1 < count) std::cout << ",";
-    }
-    std::cout << std::endl;
-    std::cout.copyfmt(oldState);
+    std::cout << hexResult << std::endl;
+
     return 0;
 }
