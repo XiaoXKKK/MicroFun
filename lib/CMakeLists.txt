@@ -2,6 +2,9 @@ add_library(mapcore STATIC
 	src/TileSplitter.cpp
 	src/TileIndex.cpp
 	src/ViewportAssembler.cpp
+	src/TileCache.cpp
+	src/AsyncTileLoader.cpp
+	src/EnhancedViewportAssembler.cpp
 	src/stb_image_all.cpp
 	src/QuadTreeNode.cpp
 	src/ColorChecker.cpp
