@@ -65,7 +65,7 @@
 ## 4. 工作流程
 
 下图展示了本方案在客户端的完整工作流程。
-<img src="WorkflowDiagram.svg" alt="工作流程图" width="80%" height="80%" style="object-fit: cover; display: block; page-break-inside: avoid;">
+`<img src="WorkflowDiagram.svg" alt="工作流程图" width="75%" height="75%" style="display: block; page-break-inside: avoid;">`
 
 ## 5. 性能预期
 

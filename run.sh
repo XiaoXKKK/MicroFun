@@ -23,11 +23,11 @@ ensure_build() {
 cmd=${1:-}; shift || true
 case "$cmd" in
   split)
-    ensure_build
+    # ensure_build
     exec "$BIN_DIR/split_tool" "$@"
     ;;
   run|check)
-    ensure_build
+    # ensure_build
     exec "$BIN_DIR/check_tool" "$@"
     ;;
   *)
