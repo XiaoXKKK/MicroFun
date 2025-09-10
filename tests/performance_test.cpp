@@ -68,9 +68,9 @@ BENCHMARK_MAIN();
 
 /*
 -------------------------------------------------------------------------------
-Benchmark                                     Time     CPU          Iterations
+Benchmark                                     Time             CPU   Iterations
 -------------------------------------------------------------------------------
-ViewportBenchmark/TileIndexQuery         142007 ns   142004 ns         4888
-ViewportBenchmark/QuadTreeIndexQuery    8010594 ns  7981581 ns           86
+ViewportBenchmark/TileIndexQuery       55870991 ns     55804571 ns           14
+ViewportBenchmark/QuadTreeIndexQuery   20026663 ns     20024657 ns           35
 
 */

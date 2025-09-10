@@ -58,7 +58,7 @@ paginate: true
 
 ```
 1. 初始化：整张地图作为根节点
-2. 复杂度分析：计算区域像素颜色方差
+2. 复杂度分析：区分纯色与复杂区域
 3. 决策分支：
    • 纯色区域 → 停止拆分，记录颜色值
    • 复杂区域 → 拆分为4个子节点
@@ -105,20 +105,7 @@ paginate: true
 
 ### 系统运行核心流程
 
-```mermaid
-graph TD
-    A[玩家视野变化] --> B[计算视野包围盒]
-    B --> C[四叉树索引查询]
-    C --> D[瓦片优先级排序]
-    D --> E[检查TileCache]
-    E --> F{缓存命中?}
-    F -->|是| G[直接渲染]
-    F -->|否| H[异步加载线程]
-    H --> I[磁盘IO读取]
-    I --> J[更新缓存]
-    J --> G
-    G --> K[LRU淘汰检查]
-```
+<img src="WorkflowDiagram.svg" alt="工作流程图" style="display: block; page-break-inside: avoid;">
 
 ---
 

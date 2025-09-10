@@ -8,3 +8,5 @@ data/
 *.pdf
 .DS_Store
 compile_commands.json
+third_party/
+*.zip
