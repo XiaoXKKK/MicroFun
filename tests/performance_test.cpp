@@ -67,10 +67,15 @@ BENCHMARK_F(ViewportBenchmark, QuadTreeIndexQuery)(benchmark::State& state) {
 BENCHMARK_MAIN();
 
 /*
+Real Performance Benchmark Results:
 -------------------------------------------------------------------------------
 Benchmark                                     Time             CPU   Iterations
 -------------------------------------------------------------------------------
 ViewportBenchmark/TileIndexQuery       55870991 ns     55804571 ns           14
 ViewportBenchmark/QuadTreeIndexQuery   20026663 ns     20024657 ns           35
 
+Performance Analysis:
+- QuadTree optimization provides ~2.8x speedup (55.8ms → 20.0ms)
+- QuadTree reduces query time by 64.1% compared to linear tile index
+- Higher iteration count for QuadTree (35 vs 14) indicates more stable performance
 */
